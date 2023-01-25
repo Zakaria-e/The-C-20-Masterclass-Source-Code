@@ -421,9 +421,9 @@ fputs("\nArrays\n", stdout);
         std::cout << std::endl;        
     }
 
-fputs("\nPointers and text storage\n", stdout);
+fputs("\nPointers\n", stdout);
 {
-    //although int *p_var reg_var {}; is valid and would create a pointer
+    //although int *p_var dataVar {}; is valid and would create a pointer
     // and int respectively, it is better to seperate into two declarations.
     int var50{71};
     int var51{271};
@@ -471,8 +471,79 @@ fputs("\nPointers and text storage\n", stdout);
     std::cout << "++p_var50;//permanently shifts the pointer's base address'" << std::endl;
     std::cout << "Address| p_var50: " << p_var50 << std::endl;
     std::cout << "Value (int)| *(p_var50): " << *(p_var50) << std::endl;
-    
+    int *p_var55 {&coll00[sizeof(coll00)/sizeof(coll00[0])]};//points to last element of coll00
+    {
+        std::ptrdiff_t ptrDiff = p_var55 - coll00; // works consistently across architectures
+        std::cout << "ptrDiff = p_var55 - coll00: " << ptrDiff << std::endl;
+    }
 
+    //Dynamic allocation on heap
+    int *p_var56{ new int}; //new dangling int-pointer pointing to allocated (uninitialized) memory space
+    p_var50 = new int(23); //Repurpose pointer to reserve heap for a single int and initialize (direct)
+    p_var51 = new int{41}; //Repurpose pointer to reserve heap for a single int and  initialize (uniform)
+
+    delete p_var56; //deallocation leaves us with a dangling pointer
+    p_var56 = p_var50; //Both currently point to same allocated heap address
+    delete p_var56; //The heap address is de-allocated leaving both p_var50 p_var56 as dangling pointers
+    p_var56 = nullptr; //ALWAYS reset to nullptr if done using a pointer
+    p_var50 = nullptr; //accessing data via p_var50 can cause crash
+    delete p_var51; //never double delete a pointer - 2nd delete will crash
+    p_var51 = nullptr; //free to reuse a pointer after delete
+    delete p_var51; //but deleting again nullptr is safe
+
+    if (p_var51 != nullptr)//verbose nullptr check
+    {
+        /* check if ptr is nullptr before use */
+    }else{
+        std::cerr << "WARNING: Trying to use invalid pointer!" << std::endl;
+    }
+    //Equivalent
+    if (p_var51)//verbose nullptr check
+    {
+        /* check if ptr is nullptr before use */
+    }else{
+        std::cerr << "WARNING: Trying to use invalid pointer!" << std::endl;
+    }
+
+    //Pointers initialized with dynamic arrays
+    //std::size, sizeof, range based for loop wont work with these, since not actual arrays
+    size_t size{10}; //doesn't have to be const for dynamic arrays
+    //double *p_var57{ new double[size] }; //  allocates space for array on heap but no initialization
+    //double *p_var57{ new(std::nothrow) double[size]{} }; //  allocates space for array on heap and initialize to 0.0
+    double *p_var57{ new(std::nothrow) double[size]{11,12,13,14} }; //allocates space for array on heap and initialize, padding with 0.0
+    delete[] p_var57; //must use []
+
+
+
+    //Memory Leak: When we lose track/access to dynamic memory (such as overwriting a heap pointer and then not being able to delete)
+    p_var51 = new int{67}; // Ok
+    //p_var51 = &var50; //NO! We now have no way to deallocate (delete) the heap space!
+    {
+        //p_var51 = new int{67}; NO! The pointer has no scope outside these brackets. Must delete within brackets
+    }
+}   
+
+fputs("\nException Handling\n", stdout);
+{
+    //for heap allocation:
+    int * data = new(std::nothrow) int[1000000000000000000];
+    //equal to:
+    try
+    {
+        int *data = new int[1000000000000000000]; //This is too big to allocate to heap and will throw an std::bad_alloc
+    }
+    catch(const std::exception& e0001)
+    {
+        int *data {nullptr};
+        std::cerr << "Failed heap allocation-Resorted to nullptr: " << e0001.what() << '\n';
+    }
+
+    
+    
+}
+
+fputs("\nText Management\n", stdout);
+{
     char message1[] {"Hello World!"};//cstring is modifiable
     message1[11] = '?';
     std::cout << "message1 : " << message1 << std::endl;
@@ -532,6 +603,8 @@ fputs("\nPointers and text storage\n", stdout);
         std::cout << std::endl;
             
     }
+
+
 }
     
     /***********************************************************************/
@@ -595,4 +668,18 @@ fputs("\nPointers and text storage\n", stdout);
     return 0;
 } 
 
-
+/* DONTS
+---Never write a value through an ininitialized pointer or a nullptr
+int * unininitializedPointer{};//nullptr
+OR
+int * unininitializedPointer;//random address which we probably don't own
+*unininitializedPointer = 5;//CRASH
+---Writing to de-allocated pointer
+int *ptrVar{};//nullptr
+ptrVar = new int; Dyncamically allocate for single int on heap. Exists until delete.
+*ptrVar = 77;// value stored on heap
+delete ptrVar; de-allocated the variable from the heap (GOOD HABIT TO: ptrVar = nullptr;)
+*ptrVar = 50;// writing to what is now foreign memory - may crash
+---Delete a hash variable twice
+delete ptrVar; //2nd delete CRASH
+*/
