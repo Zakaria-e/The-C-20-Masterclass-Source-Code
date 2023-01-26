@@ -6,7 +6,9 @@
 #include <bitset> //for bitwise ops
 #include <vector>
 #include <ctime>// for time (used in seeding )
-#include <cstdlib> 
+#include <cstdlib>
+#include <cctype> //for text analysis (std::isalnum,islower,isdigit,isspace,etc.)
+#include <cstring> //for cstring analysis (std::strcpy,strcat,strlen)
 //GLOBAL VARIABLES OUTSIDE FUNCTIONS: ACCESSIBLE TO ANYTHING AFTER ITS INIT
 // Run time value
 float global_floatVal {12.34567890123456789012345f};
@@ -89,7 +91,7 @@ void common_elements(int array_1[], int array_2[]){
 
 int main(int argc, char const *argv[])
 {   
-fputs("\nPLAYING WITH PRIMITIVE DATATYPES and compile vs runtime\n", stdout);
+fputs("\nPrimative Types, References, and compile vs runtime\n", stdout);
      double PI {3.14159f}; // constexpr variables (Read only) only used at compile time to calculate const values in runtime.
     // static_assert(PI == 5, "Bad PI"); // only uses const or constexpr
     char character1 {'a'};
@@ -99,17 +101,21 @@ fputs("\nPLAYING WITH PRIMITIVE DATATYPES and compile vs runtime\n", stdout);
     unsigned short float2uint16Val(global_floatVal);//Narrowing Functional Conversion
     unsigned short uint16Val{13214};//Braced Initialization
     unsigned short uint16Diff(float2uint16Val - uint16Val);//negative uint wraps around range
-    unsigned short uint16Diff2 = float2uint16Val - uint16Val;//Assignment Initialization
+    //unsigned short uint16Diff2 = float2uint16Val - uint16Val;//Assignment Initialization
 
+    //references cant be repurposed like pointers - More like const pointers
+    unsigned short & ref2uint16Diff{uint16Diff};//the two names will be interchangable (same address)
+    //ref2uint16Diff = uint16Val;//would simply change the value for uint16Diff as well. They are inseperable
+    //const unsigned short & ref2uint16Diff{uint16Diff};// would mean that the value can't be modified via the ref
+    
     std::cout << std::setprecision(20);
     std::cout << 
-    "Out1: " << float2uint16Val <<
-    "\nOut2: " << uint16Val <<
-    "\nOut3: " << uint16Diff <<
-    "\nOut4: " << uint16Diff2 <<
+    "float2uint16Val: " << float2uint16Val <<
+    "\nuint16Val: " << uint16Val <<
+    "\nuint16Diff: " << uint16Diff <<
+    "\nref2uint16Diff: " << ref2uint16Diff <<
     std::endl;
 
-//DO THIS !!!!!!    
 fputs("\nFormatting, BOOLS, and Subtracting uint\n", stdout);
     
     //Short hand evaluation:
@@ -158,6 +164,7 @@ fputs("\nFormatting, BOOLS, and Subtracting uint\n", stdout);
     std::cout << std::dec;
     std::cout << std::nouppercase; //disable forced uppercase
     std::cout.unsetf(std::ios::scientific|std::ios::fixed); // removes number format flags
+
 fputs("\nPre/Post-fix in/de-crement and COMMA OPERATOR\n", stdout);   
     int var00 = 5;
     std::cout << ++var00 << std::endl;
@@ -166,11 +173,10 @@ fputs("\nPre/Post-fix in/de-crement and COMMA OPERATOR\n", stdout);
     std::cout << var01++ << std::endl;
     std::cout << var01 << std::endl;
     // value +-*/%= 54 is the same as value = value +-*/%  54
-fputs("\nuint16 arithmetic handled as int\n", stdout);
-    auto productuint16 = uint16Val1 - uint16Val2;
-    std::cout << "Product: " << productuint16 <<
-    " Width: " << sizeof(productuint16) << std::endl;
+
 fputs("\nCASTING\n", stdout);
+    auto diffint = uint16Val1 - uint16Val2;
+    std::cout << "Implicit cast: auto diffint = uint16Val1 - uint16Val2 = " << diffint << std::endl;
     double var10 = 43.435;
     double var11 {44.325};
     int var12 = var10 + var11; // implicit cast of the sum to int
@@ -361,6 +367,11 @@ fputs("\nSwitch,Ternary,For,While\n", stdout);
     }
     std::cout << std::endl;
 
+    //range based for loop with reference to self
+    for (auto& i : coll00){ 
+        i*=10;//in this case i refers back to the original collection
+    }
+    std::cout <<  "coll00 is now multiplied by 10" << std::endl;
 
     {
         unsigned int i{0};
@@ -506,14 +517,25 @@ fputs("\nPointers\n", stdout);
     }
 
     //Pointers initialized with dynamic arrays
-    //std::size, sizeof, range based for loop wont work with these, since not actual arrays
+    //std::size, sizeof, range based for loop WONT work with dynamic arrays
+    //will need to use index based for loop and a size variable
     size_t size{10}; //doesn't have to be const for dynamic arrays
-    //double *p_var57{ new double[size] }; //  allocates space for array on heap but no initialization
+    //double *p_var57{ new double[size] }; //  allocates space for array on heap but no initialization (junk data)
     //double *p_var57{ new(std::nothrow) double[size]{} }; //  allocates space for array on heap and initialize to 0.0
     double *p_var57{ new(std::nothrow) double[size]{11,12,13,14} }; //allocates space for array on heap and initialize, padding with 0.0
+    if (p_var57)//verbose nullptr check
+    {
+        std::cout << "On Heap *p_var57: ";
+        for (size_t i{0}; i < size; ++i)
+        {
+            std::cout << *(p_var57+i) << " ";
+        }
+        std::cout << std::endl;
+    }else{
+        std::cerr << "WARNING: Trying to use invalid pointer!" << std::endl;
+    }
     delete[] p_var57; //must use []
-
-
+    p_var57 = nullptr;
 
     //Memory Leak: When we lose track/access to dynamic memory (such as overwriting a heap pointer and then not being able to delete)
     p_var51 = new int{67}; // Ok
@@ -521,6 +543,9 @@ fputs("\nPointers\n", stdout);
     {
         //p_var51 = new int{67}; NO! The pointer has no scope outside these brackets. Must delete within brackets
     }
+
+
+
 }   
 
 fputs("\nException Handling\n", stdout);
@@ -544,19 +569,35 @@ fputs("\nException Handling\n", stdout);
 
 fputs("\nText Management\n", stdout);
 {
-    char message1[] {"Hello World!"};//cstring is modifiable
-    message1[11] = '?';
-    std::cout << "message1 : " << message1 << std::endl;
+    char charArr[] {"Hello World!"};//cstring is modifiable at the character level
+    charArr[11] = '?';
+    std::cout << "charArr : " << charArr << std::endl; //decomposed char array
     //Array pointer points to first element in array
     //some compilers turn cstring literal into array of const char,
     //is not writable by pointer in the future... some will throw error
-    const char *p_message2{"Hello World!"};//wont compile without the const
-    std::cout << "&p_message2 : " << &p_message2 << std::endl;
-    std::cout << "p_message2 : " << p_message2 << std::endl;
-    std::cout << "p_message2[0] : " << p_message2[0] << std::endl;
-    std::cout << "*p_message2 : " << *p_message2 << std::endl;
-    //const char* is not writable. If wish to write, then use char textVar[] {"test"}
+    const char *p_charArr{"Hello World!"};//wont compile without the const
+    std::cout << "Location of the pointer: &p_charArr : " << &p_charArr << std::endl; //location of the pointer
+    std::cout << "cout reads cstring instead of ptr val: p_charArr : " << p_charArr << std::endl; //cout would print the pointer value normally, but for char* reads the cstring
+    std::cout << "must interpret as void* to shpw ptr val: (void*)p_charArr : " << (void*)p_charArr << std::endl; //first char - behavior similar to int* in this case
+    std::cout << "cout reads ith char of cstring: p_charArr[0] : " << p_charArr[0] << std::endl; //first char (only for cstring)
+    std::cout << "normal pointer read: *p_charArr : " << *p_charArr << std::endl; //first char - behavior similar to int* in this case
+
+    //const char* is not writable at the character level.
+    //If wish to write, then use char textVar[] {"test"} to replace entire text
     
+    //count lowercase
+    {
+        int count{};
+
+        for (size_t i = 0; i < std::size(charArr); i++)//sizeof(charArr)/sizeof(charArr[0]) same
+            {
+                if(islower(charArr[i])){
+                    charArr[i] = std::toupper(charArr[i]);
+                    count++;
+                }
+            }
+        std::cout << "There was " << count << " lowercase letters in " << charArr << std::endl;
+    }
     // shitty way of storing several strings:
     //disgusting code. each var is a writable c-string of exactly the size needed
     {
@@ -582,7 +623,7 @@ fputs("\nText Management\n", stdout);
         }
         std::cout << std::endl;
     }
-    // better way of storing several strings (no limit per string):
+    // better way of storing several Cstrings (no limit per string):
     // efficient memory and no char limit, but not writable
     {
         const char *textVar[] {
@@ -594,14 +635,52 @@ fputs("\nText Management\n", stdout);
 
         // Although the char arrays themselves are const, pointers are not
         // and can be swapped for other pointers to const char array
-        const char *string1 {"These are many strings"};
-        textVar[0] = string1;
+        const char *string1[] {"These are swappable strings"};
+        textVar[0] = string1[0];
         for (const char * Line : textVar)
         {
             std::cout << Line << " ";
         }
         std::cout << std::endl;
-            
+        std::cout << "sizeof(textVar): "<< sizeof(textVar) << std::endl; //4 pointers x 8Byte = 32
+        std::cout << "sizeof(textVar[0]): "<< sizeof(textVar[0]) << std::endl; //single pointer x 8Byte = 8
+        std::cout << "sizeof(textVar)/sizeof(textVar[0]): "<< sizeof(textVar)/sizeof(textVar[0]) << std::endl; //will count cstring pointers - not chars
+        std::cout << "std::strlen(textVar[0]): "<< std::strlen(textVar[0]) << std::endl; //counts till /0
+
+        const char *dir1{"D:\\Users\\ZGamingPC\\Downloads\\file.xls"};
+        const char *dir2{"D:\\Users\\ZGamingPC\\Downloads\\filE.xlsx"};
+        std::cout << "dir1: " << dir1 << std::endl;
+        std::cout << "dir2: " << dir2 << std::endl;
+        
+        //strcmp returns 0 if str1==str2. 1 if str1 is lexicographically after str2 (str1>str2). -1 if str1<str2
+        // ASCII ORDER: /0 < SPACE < NUM < UPPER < LOWER
+        std::cout << "std::strcmp(dir1,dir2): "<< std::strcmp(dir1,dir2) << std::endl;
+        std::cout << "std::strcmp(dir2,dir1): "<< std::strcmp(dir2,dir1) << std::endl;
+        
+        // strchr finds the target character and returns a the char pointer starting with the first found instance
+        //strrchr is the right to left scan and is better for this application
+        // returns nullptr when no more found (which is the cue to break the loop)
+        char targetChar{'\\'};
+        const char *result = dir1; //initialize to the cstring to be scanned
+        const char *lastValidResult{}; //initialize to the cstring to be scanned
+        size_t i{};
+        while ((result = std::strrchr(result,targetChar)) != nullptr)
+        {
+            std::cout << "i: " << i << "\tFound '" << targetChar << "' at "<< (void*)result << "\t" << result << std::endl;
+            lastValidResult = result;
+            ++result;
+            ++i;
+        }
+
+        //we will compare the directory excluding the file name
+        // std::ptrdiff_t dirLength = dir1 - static_cast<void*>(result);
+        std::cout << "(void*)dir1: " << (void*)dir1 << std::endl;
+        std::cout << "(void*)lastValidResult: " << (void*)lastValidResult << std::endl;
+        std::ptrdiff_t dirLength = lastValidResult - dir1;
+        std::cout << "dirLength = dir1 - result: " << dirLength << std::endl;
+        std::cout << "std::strncmp(dir1,dir2,dirLength): "<< std::strncmp(dir1,dir2,dirLength) << std::endl;
+
+        
     }
 
 
