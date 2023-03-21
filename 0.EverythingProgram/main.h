@@ -8,6 +8,11 @@ enum class Month : unsigned char{
     Oct, Nov, Dec
 };
 
+// Old enums implicitly tranform to int
+enum Direction{
+    Top=30, Bottom, Left, Right
+};
+
 void scriptfxn1();//decleration/protoype
 void hunt_for_vowels(char message[], unsigned int size);
 void common_elements_val(int array_1[], int array_2[], size_t size1, size_t size2);

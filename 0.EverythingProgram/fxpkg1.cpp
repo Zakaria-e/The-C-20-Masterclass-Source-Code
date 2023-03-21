@@ -360,6 +360,10 @@ fputs("\nArrays\n", stdout);
 
 fputs("\nPointers\n", stdout);
 {
+    int       *      mutable_pointer_to_mutable_int{};
+    int const *      mutable_pointer_to_constant_int{};
+    int       *const constant_pointer_to_mutable_int{};
+    int const *const constant_pointer_to_constant_int{};
     //although int *p_var dataVar {}; is valid and would create a pointer
     // and int respectively, it is better to seperate into two declarations.
     int var50{71};
@@ -645,17 +649,32 @@ fputs("\nText Management\n", stdout);
 
         
     }
-fputs("\nFunctions and Enums\n", stdout);
+fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
     {
         //pass by pointer
         int value = 753;
         std::cout << "int value:" << value << " &val:" << &value << std::endl;
         passByPointerDemoFx(&value);
         passByReferenceDemoFx(value);
-        //Using Enum
+
+
+        //Using New Enum
         Month mth{Month::Feb};
-        std::cout << "Month: " << month_to_string(mth) << std::endl;
-        
+        std::cout << "New Enum (Via sting_view): " << month_to_string(mth) << std::endl;
+        std::cout << "New Enum (static_cast<uint>): " << static_cast<unsigned int>(mth) << std::endl;
+
+        //Using old Enum
+        Direction direction{Direction::Bottom};//could also forgo "Direction::"
+        //returns int represented by "Direction" value
+        // enabling comparisons and math... which is wierd
+        std::cout << "Direction: " << direction << std::endl; 
+
+        //Type aliases are shorthand for annoying type names
+        using ULLInt = unsigned long long int;
+        //same as:
+        //typedef unsigned long long int ULLInt;
+        ULLInt huge_num {12'345'678'901'234'567ull};
+        std::cout << "huge_num: " << huge_num << std::endl;
     
     }
 

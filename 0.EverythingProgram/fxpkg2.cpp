@@ -147,11 +147,12 @@ int max_subsequence_sum(int sequence[] , unsigned int size){
     //DON'T MODIFY ANYTHING BELOW THIS LINE 
 }
 
+//Using new Enums
 std::string_view month_to_string(Month month){
     switch(month)
     {
-        using enum Month;
-        case Jan : return "January";
+        using enum Month;//older compilers require Month::Jan and removing this line
+        case Jan : return "January"; 
         case Feb : return "February";
         case Mar : return "March";
         case Apr : return "April";
@@ -166,3 +167,4 @@ std::string_view month_to_string(Month month){
         default : return "None";
     }
 }
+
