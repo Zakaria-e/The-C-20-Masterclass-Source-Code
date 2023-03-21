@@ -9,8 +9,7 @@
 #include <cstdlib>
 #include <cctype> //for text analysis (std::isalnum,islower,isdigit,isspace,etc.)
 #include <cstring> //for cstring analysis (std::strcpy,strcat,strlen)
-#include "main.h"
-
+#include "scripts1.h"
 
 // This is initialized at compile time, and can be modified at runtime
 constinit double global_doubleVal {12.34567890123456789012345f};

@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 
-int main(int argc , char** argv){
+int CALC(int argc , char** argv){
 
     //Check the number of parameters
     if(argc != 4){

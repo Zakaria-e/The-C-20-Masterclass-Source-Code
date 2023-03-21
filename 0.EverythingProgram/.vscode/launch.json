@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "d:/Udemy/CPP/Course Source Code/0.EverythingProgram",
-      "program": "d:/Udemy/CPP/Course Source Code/0.EverythingProgram/build/Debug/outDebug",
+      "cwd": "d:/Zakar/Documents/GitHub/The-C-20-Masterclass-Source-Code/0.EverythingProgram",
+      "program": "d:/Zakar/Documents/GitHub/The-C-20-Masterclass-Source-Code/0.EverythingProgram/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -100,5 +100,7 @@
     "**/.*/**",
     "**/.vscode",
     "**/.vscode/**"
-  ]
+  ],
+  "C_Cpp_Runner.useAddressSanitizer": false,
+  "cmake.configureOnOpen": true
 }

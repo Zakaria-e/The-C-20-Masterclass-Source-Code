@@ -9,12 +9,84 @@
 #include <cstdlib>
 #include <cctype> //for text analysis (std::isalnum,islower,isdigit,isspace,etc.)
 #include <cstring> //for cstring analysis (std::strcpy,strcat,strlen)
-#include <string_view>
-#include "main.h"
-
 //GLOBAL VARIABLES OUTSIDE FUNCTIONS: ACCESSIBLE TO ANYTHING AFTER ITS INIT
 // Run time value
 float global_floatVal {12.34567890123456789012345f};
+// This is initialized at compile time, and can be modified at runtime
+constinit double global_doubleVal {12.34567890123456789012345f};
+//const and constinit can be combined
+const constinit long double global_longdoubleVal {12.34567890123456789012345f};
+/*
+constinit float badvalue1 {global_floatVal}; 
+*/ 
+//compiler error: global_floatVal must be const
+void func1(){
+    int local_var{30};//scope only within function
+    {
+        int nested_local_var{5};//scope only within braces
+    }
+}
+
+void hunt_for_vowels(char message[], unsigned int size){
+//see assignment 4
+    unsigned int vowel_count{};//Initialized to zero
+    
+    //Don't modify anything above this line
+    //Your code should go below this line
+    for(size_t i{0} ; i<size ; ++i){
+        if (message[i] == 'a' || message[i] == 'e' || message[i] == 'i' || message[i] == 'o' || message[i] == 'u' ||
+         message[i] == 'A' || message[i] == 'E' || message[i] == 'I' || message[i] == 'O' || message[i] == 'U')
+        {
+            vowel_count++;
+        }
+        
+    }
+    
+    
+    //Your code should go above this line
+    //Don't modify anything below this line
+    
+    
+    std::cout << "The string : " << message << " has " << vowel_count << " vowels";  
+}
+
+void common_elements(int array_1[], int array_2[]){
+    // REMEMBER, The input arrays array_1 and array_2 have a fixed size of 10
+    size_t size_array = 10;//sizeof(array_1[0]);
+    size_t num_common_elements{0};
+    int matches[size_array]{};//initialize to all to 0
+    for (size_t i = 0; i < size_array; i++)//cycle through dataset 1
+    {
+        for (size_t j = 0; j < size_array; j++)
+        {
+            if (array_1[i]==array_2[j]){
+                matches[num_common_elements] = array_1[i];
+                ++num_common_elements;
+                break;
+            }
+        }
+    }
+  if (num_common_elements==0)
+  {
+    std::cout << "There are 0 common elements";
+  }else{
+    std::cout << "There are " << num_common_elements << " common elements they are : ";
+    for (size_t i = 0; i < num_common_elements; i++)
+    {
+        std::cout <<  matches[i] << " ";
+    }
+  }
+}
+
+void scriptfxn1();//decleration/protoype
+
+int main(int argc, char const *argv[])
+{   
+    scriptfxn1();
+
+    return 0;
+} 
+
 
 void scriptfxn1(){//definition
 fputs("\nPrimative Types, References, and compile vs runtime\n", stdout);
@@ -360,10 +432,6 @@ fputs("\nArrays\n", stdout);
 
 fputs("\nPointers\n", stdout);
 {
-    int       *      mutable_pointer_to_mutable_int{};
-    int const *      mutable_pointer_to_constant_int{};
-    int       *const constant_pointer_to_mutable_int{};
-    int const *const constant_pointer_to_constant_int{};
     //although int *p_var dataVar {}; is valid and would create a pointer
     // and int respectively, it is better to seperate into two declarations.
     int var50{71};
@@ -642,41 +710,8 @@ fputs("\nText Management\n", stdout);
         // int REG_read = std::to_;
         // int ZON_read = 32;
         }
-
-        /*
-        SEE 190,191 for stringview implicit conversion in fx params
-        */
-
-        
     }
-fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
-    {
-        //pass by pointer
-        int value = 753;
-        std::cout << "int value:" << value << " &val:" << &value << std::endl;
-        passByPointerDemoFx(&value);
-        passByReferenceDemoFx(value);
 
-
-        //Using New Enum
-        Month mth{Month::Feb};
-        std::cout << "New Enum (Via sting_view): " << month_to_string(mth) << std::endl;
-        std::cout << "New Enum (static_cast<uint>): " << static_cast<unsigned int>(mth) << std::endl;
-
-        //Using old Enum
-        Direction direction{Direction::Bottom};//could also forgo "Direction::"
-        //returns int represented by "Direction" value
-        // enabling comparisons and math... which is wierd
-        std::cout << "Direction: " << direction << std::endl; 
-
-        //Type aliases are shorthand for annoying type names
-        using ULLInt = unsigned long long int;
-        //same as:
-        //typedef unsigned long long int ULLInt;
-        ULLInt huge_num {12'345'678'901'234'567ull};
-        std::cout << "huge_num: " << huge_num << std::endl;
-    
-    }
 
 }
     
@@ -731,20 +766,11 @@ fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
         //excersize defines 10 elements per dataset
         int data1[] {1,2,4,5,9,3,6,7,44,55};
         int data2[] {11,2,44,45,49,43,46,47,55,88};
-        common_elements_val(data1, data2,10,10);
-        common_elements_ref(data1, data2,10,10);
-    }break;
-    case 6:{
-        fputs("\nMaximum Subsequence\n", stdout);
-        //excersize defines 10 elements per dataset
-        int data[] {3,-4 ,6,1,1,-2,2,3};
-        auto result = max_subsequence_sum(data , sizeof(data)/sizeof(data[0]));
-        std::cout << std::endl << "result : " << result << std::endl;
+        common_elements(data1, data2);
     }break;
     default:
         break;
     }
-
 }
 
 /* DONTS

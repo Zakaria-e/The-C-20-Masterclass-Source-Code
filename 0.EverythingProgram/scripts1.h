@@ -1,0 +1,1 @@
+void scriptfxn1();//decleration/protoype
