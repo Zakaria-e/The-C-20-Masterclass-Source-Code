@@ -1,15 +1,3 @@
-#include <iostream>
-#include <iomanip>
- //https://en.cppreference.com/w/cpp/io/manip
-#include <cmath> //std::floor,ceil,round,abs,sin,cos,tan,exp,log,log10,pow,sqrt
-// https://en.cppreference.com/w/cpp/header/cmath
-#include <bitset> //for bitwise ops
-#include <vector>
-#include <ctime>// for time (used in seeding )
-#include <cstdlib>
-#include <cctype> //for text analysis (std::isalnum,islower,isdigit,isspace,etc.)
-#include <cstring> //for cstring analysis (std::strcpy,strcat,strlen)
-// #include <string_view>
 #include "functions1.h"
 
 
@@ -117,8 +105,6 @@ void common_elements_ref(int (&array_1)[], int (&array_2)[], size_t size1, size_
   }
 }
 
-
-
 int max_subsequence_sum(int sequence[] , unsigned int size){
     //YOUR CODE WILL GO BELOW THIS LINE 
     //DON'T MODIFY ANYTHING ABOVE THIS LINE
@@ -164,5 +150,28 @@ std::string_view month_to_string(Month month){
         case Dec : return "December";
         default : return "None";
     }
+}
+
+std::optional<size_t> find_character(const std::string & str,
+										std::optional<char> c = std::nullopt){
+    //If found set return index, else return empty
+    //If c is specified, find it else just find 'z'
+    /*
+    char char_to_find;
+    if(c.has_value()){
+        char_to_find = c.value();
+    }else{
+        char_to_find = 'z'; // Will find z by default
+    }
+    */
+   char char_to_find = c.value_or(' ');
+    
+    for (size_t i{} ; i < str.size()  ; ++i){
+        //std::cout << "str[i] : " << str.at(i) << " , c : " << c << std::endl;
+        if(str.c_str()[i] == char_to_find){
+            return i;
+        }
+    }
+   return {};// Or std::nullopt
 }
 

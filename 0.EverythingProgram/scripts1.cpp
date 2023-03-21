@@ -10,6 +10,7 @@
 #include <cctype> //for text analysis (std::isalnum,islower,isdigit,isspace,etc.)
 #include <cstring> //for cstring analysis (std::strcpy,strcat,strlen)
 #include <string_view>
+#include <optional>
 #include "functions1.h"
 #include "scripts1.h"
 
@@ -677,6 +678,25 @@ fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
         ULLInt huge_num {12'345'678'901'234'567ull};
         std::cout << "huge_num: " << huge_num << std::endl;
     
+
+        std::string str1 {"Hello World in C++20!"};
+	    std::optional<char> c{'C'};
+        auto result1 = find_character(str1,c); //Will search for SPACE if you don't specify 
+        if(result1.has_value()){
+            std::cout << "Found character '" << c.value() <<"' at index " << result1.value() << std::endl;
+        }else{
+            std::cout << "Could not find character '" << c.value() <<"' in the string : " << str1 << std::endl;
+        }
+
+        //functions can be overloaded by any functional difference in fx params such as 
+        // varying order,quantity, or type of parameters
+        //example of functional equivilance is int * foo, int foo[], and int foo[6], sinch last 2 decay to int *
+        //weird situations with refs when more than 1 overload is acceptable for implicit conversion:
+        // Alternative fx param definitions: const std::string& name, std::string name
+        //  actual param: std::strng OR string literal
+        //      compiler error due to ambiguity on how std::string input should be handled
+        // Alternative fx param definitions: double a, int& a
+        //  actual param: char a{45}
     }
 
 }
