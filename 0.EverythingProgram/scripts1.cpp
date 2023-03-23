@@ -688,15 +688,46 @@ fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
             std::cout << "Could not find character '" << c.value() <<"' in the string : " << str1 << std::endl;
         }
 
-        //functions can be overloaded by any functional difference in fx params such as 
-        // varying order,quantity, or type of parameters
-        //example of functional equivilance is int * foo, int foo[], and int foo[6], sinch last 2 decay to int *
-        //weird situations with refs when more than 1 overload is acceptable for implicit conversion:
-        // Alternative fx param definitions: const std::string& name, std::string name
-        //  actual param: std::strng OR string literal
-        //      compiler error due to ambiguity on how std::string input should be handled
-        // Alternative fx param definitions: double a, int& a
-        //  actual param: char a{45}
+        //OVERLOADS: see functions1.cpp/h
+        {
+            short x{32LL};
+            short y{-123LL};
+            //const short would still use overload: const int&
+            //and obiously, const int pararm -> const int& overload
+            short z = add(x,y);//impConv overload: const int& (imconv allowed since const->copy)
+        }
+
+        {
+            int x{32LL};
+            int y{-123LL};
+            short z = add(x,y);//overload: int&
+        }
+
+        {
+            int x{32LL};
+            int y{-123LL};
+            const int u{32LL};
+            const int v{-123LL};
+            int z = add(&x,&y); //overload: int *
+            int w = add(&u,&v); //overload: const int *
+        }
+
+        {
+            float x{32LL};
+            float y{-123LL};
+            float z = add(x,y);//impConv to overload: double
+        }
+        {
+            std::string x{"Hello"};
+            std::string y{"World"};
+            std::string z = add(x,y);//overload: string &
+        }
+        {
+            char x[20] = "Hello ";
+            char y[] = "World";
+            const char* z{add(x,y)};
+            std::cout << z << std::endl;//overload: const *
+        }
     }
 
 }
@@ -761,6 +792,12 @@ fputs("\nFunctions, Enums, and Type Aliases\n", stdout);
         int data[] {3,-4 ,6,1,1,-2,2,3};
         auto result = max_subsequence_sum(data , sizeof(data)/sizeof(data[0]));
         std::cout << std::endl << "result : " << result << std::endl;
+    }break;
+    case 7:{
+        fputs("\nInsertion Sort\n", stdout);
+        //excersize defines 10 elements per dataset
+        int data[] {3,-4 ,6,1,1,-2,2,3};
+        insertion_sort(data , sizeof(data)/sizeof(data[0]));
     }break;
     default:
         break;

@@ -4,8 +4,72 @@
 /*
 Fx prefix   constexpr allows Fx to run at compiletime;
             consteval ensures the function gets called at compile time (or throw error)
-
 */
+
+// FUNCTION OVERLOADS
+// functions can be overloaded by any functional difference in fx params such as 
+// varying order,quantity, or type of parameters(T* and const T* are seen as different)
+//
+// for passing by value, constness does not differentiate since copying anyway
+//
+// example of functional equivilance is int * foo, int foo[], and int foo[6], sinch last 2 decay to int *
+// weird situations with refs when more than 1 overload is acceptable for implicit conversion:
+// Alternative fx param definitions: const std::string& name, std::string name
+//  actual param: std::strng OR string literal
+//      compiler error due to ambiguity on how std::string input should be handled
+// Alternative fx param definitions: double a, int& a (const to allow for implicit conversion)
+//  actual param: char a{45}
+//      compiler will 
+
+//anything that implicitly convert to int captured here
+// integer types will prefer implicit convertion here
+int add(const int& a, const int& b){
+    std::cout << "Using overload: 'const int&'" <<std::endl;
+    return a+b;
+}
+
+int add(int& a, int& b){
+    std::cout << "Using overload: 'int&'" <<std::endl;
+    return a+b;
+}
+
+int add(int *a, int *b){
+    std::cout << "Using overload: 'int*'" <<std::endl;
+    return *a+*b;
+}
+
+// SAME AS THE ABOVE, since both will be copys of pointer
+// choose *const variant to indicate that the local pointer should not be modified
+// int add(int *const a, int *const b){
+//     std::cout << "Using overload: 'int *const'" <<std::endl;
+//     return *a+*b;
+// }
+
+int add(const int *a, const int *b){
+    std::cout << "Using overload: 'const int*'" <<std::endl;
+    return *a+*b;
+}
+
+//anything that implicitly convert to double captured here
+// float types will prefer implicit convertion here
+double add(const double& a, const double& b){
+    std::cout << "Using overload: 'const double&'" <<std::endl;
+    return a+b;
+}
+// using non-const reference removes the posibility of char*
+// being implicitly converted to string. This overload will now
+// not compete with the char* overload, removing ambiguity error
+std::string add( std::string& a,std::string& b){
+    std::cout << "Using overload: 'std::string&'" <<std::endl;
+    return a+b;
+}
+
+const char* add( char* a, const char* b){
+    //requires a to have enough reserved space for b
+    std::cout << "Using overload: 'char*'" <<std::endl;
+    return std::strcat(a,b);
+}
+
 // int* copy pointer = no local copy of DATA
 // const int*:  data protected from modification
 // onst int* const:  the local pointer copy is protected
@@ -32,6 +96,12 @@ void scopeDemoFx(){
     }
 }
 
+void print_array(int* arr, unsigned int n) 
+{ 
+    for (unsigned int i = 0; i < n; i++){
+        std::cout << arr[i] << " "; 
+    }
+}
 
 void hunt_for_vowels(char message[], unsigned int size){
 //see assignment 4
@@ -173,5 +243,39 @@ std::optional<size_t> find_character(const std::string & str,
         }
     }
    return {};// Or std::nullopt
+}
+
+void insertion_sort(int * array, unsigned int size){
+    std::cout << "\nSEQ Size: " << size << std::endl;
+    print_array(array,size);
+    std::cout << std::endl;
+    for (size_t key_i = 1; key_i < size; key_i++) {
+        int key_v = array[key_i];
+        std::cout << "\nKey_v: " << key_v << "  @Key_i: " << key_i << std::endl;
+        for (size_t cmp_i = key_i - 1; cmp_i >= 0; --cmp_i)
+        {
+            std::cout << "cmp_i = " << cmp_i << " : ";
+            print_array(array,size);
+            std::cout << ">> ";
+            if(array[cmp_i] > key_v){
+                array[cmp_i+1] = array[cmp_i];//shift compared val left
+                if (cmp_i == 0)
+                {
+                    array[cmp_i] = key_v;
+                    print_array(array,size);
+                    std::cout << std::endl;
+                    break;
+                }
+                print_array(array,size);
+                std::cout << std::endl;
+            }else{
+                array[cmp_i+1] = key_v; //replace with key val
+                print_array(array,size);
+                std::cout << std::endl;
+                break;
+            }
+        }
+
+    }
 }
 
